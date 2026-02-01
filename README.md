@@ -1,34 +1,20 @@
-## Navigation
-Pour naviguer entre les différentes étapes du processus veuillez sélectionner les sous-branches nommées dans l'ordre d'exécution
+## Ouverture du reporting CA d'une des régions
 
-<img width="1072" height="383" alt="image" src="https://github.com/user-attachments/assets/7b3c7f3d-3cb6-43eb-8c3b-1125e7bc0e7d" />
+## VBA : Nettoyage des 5 onglets
+- Résumé : Le code nettoie les plages du reporting comprenant des valeurs brutes, en moins de 10 secondes, tout en prenant soin de ne toucher aucune plage contenant des formules.
+- Le code annoté est disponible sous le nom "CODE VBA - NETTOYAGE DES DONNEES" en pièce-jointe du projet.
 
-## 🏢 Contexte
-Dans le cadre de mon alternance en contrôle de gestion chez Polyexpert j'ai automatisé le reporting quotidien du chiffre d'affaires pour deux régions.
+## VBA : Import des nouvelles bases
+- Résumé : Le code importe les plages des fichiers "source" vers les plages des fichiers "destination" en 30 sec. Code factorisé de sorte à dupliquer facilement le code en modifiant simplement les nuoveaux chemins source / destination ainsi que les plages source / destination.
+- Le code annoté est disponible sous le nom "CODE VBA - IMPORT DES DONNEES" en pièce-jointe du projet.
 
-## 🎯 Objectifs
-Automatiser entièrement le reporting pour :
-- Éliminer les tâches répétitives et manuelles
-- Fiabiliser la consolidation des données
-- Augmenter la productivité du pôle 
+## Controle cohérence et actualisation du reporting
+- Le controle cohérence s'effectue à la main après avoir actualisé les données et consiste à détecter la présence ou non d'anomalies dans les feuilles de calcul et dans la synthèse (envoyée à la direction).
+- Automatiser 90% du travail pour garder 10% de controles permet de gagner en productivité tout en s'assurant que les process sont maitrisés.
 
-## 🚀 Résultats
-- Temps de mise à jour quotidien pour deux régions : 1h30 → 15 min (83% plus efficace)
-- Réduction des erreurs manuelles
-- Processus reproductible et scalable (l'architecture du workflow a été adaptée pour d'autres reporting)
+## VBA : Envoi du reporting
+- Le mail est généré avec les destinataires et les pièces-jointes renseignées, de plus l'objet et le corps du mail sont remplis de manière automatique.
+- Le brouillon est enregistré dans outlook et pret pour un dernier controle avant envoi.
+- Le code annoté est disponible sous le nom "CODE VBA - ENVOI DU MAIL" en pièce-jointe du projet.
 
-## 🔁 Workflow
-1. Programmation de 11 extractions via ERP
-2. Collecte automatique des extractions, traitement et rangement des fichiers via Power Automate
-3. Importation des plages de données via VBA
-5. Actualisation des données et contrôles de cohérence (vérifications manuelles)
-6. Génération automatique du mail via VBA et envoi à la direction
-
-## 🛠 Outils techniques
-- Power Automate
-- Excel / VBA
-- ERP : Jasper software 
-
-## 📁 Contenu du projet
-- Etape 1 : ERP et Power Automate Desktop
-- Etape 2 : VBA
+## Reporting terminé

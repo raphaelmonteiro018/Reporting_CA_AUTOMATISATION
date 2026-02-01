@@ -12,6 +12,11 @@ Automatiser entièrement le reporting pour :
 - Fiabiliser la consolidation des données
 - Augmenter la productivité du pôle 
 
+## 🚀 Résultats
+- Temps de mise à jour quotidien pour deux régions : 1h30 → 15 min (83% plus efficace)
+- Réduction des erreurs manuelles
+- Processus reproductible et scalable (l'architecture du workflow a été adaptée pour d'autres reporting)
+
 ## 🔁 Workflow
 1. Programmation de 11 extractions via ERP
 2. Collecte automatique des extractions, traitement et rangement des fichiers via Power Automate
@@ -23,11 +28,6 @@ Automatiser entièrement le reporting pour :
 - Power Automate
 - Excel / VBA
 - ERP : Jasper software 
-
-## 🚀 Résultats
-- Temps de mise à jour quotidien pour deux régions : 1h30 → 15 min (83% plus efficace)
-- Réduction des erreurs manuelles
-- Processus reproductible et scalable (l'architecture du workflow a été adaptée pour d'autres reporting)
 
 ## 📁 Contenu du projet
 - Etape 1 : ERP et Power Automate Desktop

@@ -9,8 +9,8 @@
 - Le code annoté est disponible sous le nom "CODE VBA - IMPORT DES DONNEES" en pièce-jointe du projet.
 
 ## Controle cohérence et actualisation du reporting
-- Le controle cohérence s'effectue à la main après avoir actualisé les données et consiste à détecter la présence ou non d'anomalies dans les feuilles de calcul et dans la synthèse (envoyée à la direction).
-- Automatiser 90% du travail pour garder 10% de controles permet de gagner en productivité tout en s'assurant que les process sont maitrisés.
+- Le contrôle de cohérence s'effectue manuellement après avoir actualisé les données. IL consiste à détecter la présence ou non d'anomalies dans les feuilles de calcul et dans la synthèse envoyée à la direction.
+- Automatiser 90% du travail pour garder 10% de contrôles permet de gagner en productivité tout en assurant la maitrise du processus.
 
 ## VBA : Envoi du reporting
 - Le mail est généré avec les destinataires et les pièces-jointes renseignées, de plus l'objet et le corps du mail sont remplis de manière automatique.

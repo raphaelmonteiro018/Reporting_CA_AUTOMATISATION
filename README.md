@@ -30,5 +30,5 @@ Automatiser entièrement le reporting pour :
 - ERP : Jasper software 
 
 ## 📁 Contenu du projet
-- Etape 1 : ERP et Power Automate Desktop
-- Etape 2 : VBA
+- Etape 1 : Récupération et traitement des extractions
+- Etape 2 : Actualisation et envoi du reporting

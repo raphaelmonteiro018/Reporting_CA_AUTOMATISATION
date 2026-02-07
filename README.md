@@ -30,4 +30,5 @@ Automatiser entièrement le reporting pour :
 
 ## Navigation
 Pour naviguer entre les différentes étapes du processus veuillez sélectionner les sous-branches nommées dans l'ordre d'exécution.
-<img width="461" height="553" alt="image" src="https://github.com/user-attachments/assets/824d8051-4d13-4183-bfd7-eb8ce8d52935" />
+<img width="1852" height="542" alt="image" src="https://github.com/user-attachments/assets/4caed3ab-4151-4916-a118-1ca66b3adceb" />
+

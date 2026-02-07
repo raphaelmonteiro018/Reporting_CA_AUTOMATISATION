@@ -1,5 +1,5 @@
 ## 🏢 Contexte
-Dans le cadre de mon alternance en contrôle de gestion chez Polyexpert j'ai automatisé le reporting quotidien du chiffre d'affaires pour deux régions.
+Dans le cadre de mon alternance en contrôle de gestion chez Polyexpert j'ai automatisé un certain nombre de process dont le reporting quotidien du chiffre d'affaires pour deux régions.
 
 ## 🎯 Objectifs
 Automatiser entièrement le reporting pour :

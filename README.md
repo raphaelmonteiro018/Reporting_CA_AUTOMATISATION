@@ -1,8 +1,3 @@
-## Navigation
-Pour naviguer entre les différentes étapes du processus veuillez sélectionner les sous-branches nommées dans l'ordre d'exécution.
-
-<img width="1072" height="383" alt="image" src="https://github.com/user-attachments/assets/7b3c7f3d-3cb6-43eb-8c3b-1125e7bc0e7d" />
-
 ## 🏢 Contexte
 Dans le cadre de mon alternance en contrôle de gestion chez Polyexpert j'ai automatisé le reporting quotidien du chiffre d'affaires pour deux régions.
 
@@ -32,3 +27,8 @@ Automatiser entièrement le reporting pour :
 ## 📁 Contenu du projet
 - Etape 1 : Récupération et traitement automatique des extractions.
 - Etape 2 : Actualisation, contrôle et envoi du reporting.
+
+## Navigation
+Pour naviguer entre les différentes étapes du processus veuillez sélectionner les sous-branches nommées dans l'ordre d'exécution.
+
+<img width="1072" height="383" alt="image" src="https://github.com/user-attachments/assets/7b3c7f3d-3cb6-43eb-8c3b-1125e7bc0e7d" />

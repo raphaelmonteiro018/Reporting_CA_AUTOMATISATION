@@ -14,10 +14,5 @@
 <img width="1210" height="667" alt="image" src="https://github.com/user-attachments/assets/e6367310-9428-436d-bf36-3c2694424acb" />
 
 ## Power Automate Desktop : Résultat final
-Le workflow s'exécute en arrière-plan, en 1 minute les extractions des deux régions sont actualisées, rangées et prêtes pour l'import via VBA.
-
-- Voici l'arborescence de dossiers utilisée pour le rangement des extractions sur une région :
-<img width="707" height="556" alt="image" src="https://github.com/user-attachments/assets/745197fa-81a7-441a-9ac8-a0b98066805f" />
-
-
-VBA permet ensuite d'aller piocher les plages désirées dans chaque fichier exporté pour les coller dans les plages spécifiées du reporting.
+- Le workflow s'exécute en arrière-plan, en 1 minute les extractions des deux régions sont actualisées, rangées dans des dossiers spécifiques et prêtes pour l'import.
+- Le code VBA va ensuite piocher les plages désirées dans chaque fichier exporté pour les coller dans les plages spécifiées du reporting.

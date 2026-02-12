@@ -1,171 +1,263 @@
-Option Explicit
+' =====================================================================
+' ==================  ZONE DE CONFIGURATION  ==========================
+' =====================================================================
+' Modifier UNIQUEMENT la fonction "ObtenirConfiguration" pour appliquer
+' la logique d'import à d'autres reportings + lire les annotations pour
+' naviguer aisément dans le code.
+' =====================================================================
 
-' ========================================================================================================================
-' DESCRIPTION DU CODE D'IMPORT DES DONNEES
-' ========================================================================================================================
-' Ce code importe automatiquement les plages des fichiers Excel vers leurs feuilles de destination respectives.
-'
-' Caractéristiques :
-' - Optimisation maximale des performances (rafraichissement écran, événements et calculs désactivés lors de l'exécution)
-' - Fonction d’import générique et factorisée
-' - Facilité de maintenance grâce aux annotations dans le code et à la factorisation
-' ========================================================================================================================
-Public Sub Import_CA_Region1()
+' ===== MESSAGES D'ÉTAT =====
+Const MSG_DEBUT As String = "Début de l'importation..."
+Const MSG_SUCCES As String = "✅ Toutes les bases ont été importées avec succès."
+Const MSG_ERREUR_PARTIEL As String = "⚠️ Importation terminée avec des erreurs."
 
-    Dim sourceFoldersCA() As String
-    Dim templateRangesCA() As String
-    Dim folderAR09 As String, folderVISIO As String, folderCORRESP As String
-    Dim rangeAR09 As String, rangeVISIO As String, rangeCORRESP As String
+
+Private Type ConfigImport
+    dossier As String
+    Plage As String
+    Feuille As String
+    ModeAppend As Boolean
+    Message As String
+End Type
+
+Function ObtenirConfiguration() As ConfigImport()
+
+    ' ===== CHEMIN DE BASE COMMUN À TOUS LES IMPORTS =====
+    ' Ce chemin sera automatiquement ajouté devant chaque sous-dossier
+    Const CHEMIN_BASE As String = "\\idfpls03\Assistant\REPORTING POLE\Actualisation des rapports\CA IDFC"
+
+    ' ===== NOMBRE D'IMPORTS À EFFECTUER =====
+    ' Si vous avez 6 imports : écrire "ReDim config(0 To 5)"
+    ' Si vous avez 3 imports : écrire "ReDim config(0 To 2)"
+    Dim config() As ConfigImport
+    ReDim config(0 To 4)  ' Ici nous avons 5 imports (de 0 à 4)
+
+    ' =====================================================================
+    ' ===== DÉFINITION DE CHAQUE IMPORT (1 BLOC = 1 IMPORT) =====
+    ' =====================================================================
+    ' Pour chaque import, remplir les 5 lignes suivantes :
+    '   .dossier     : Chemin du dossier contenant les fichiers Excel source
+    '   .Plage       : Plage de cellules à copier (format "A1:Z10")
+    '   .Feuille     : Nom de la feuille de destination dans CE classeur
+    '   .ModeAppend  : True = ajouter à la suite | False = écraser à partir de la ligne 2
+    '   .Message     : Texte affiché dans la barre d'état pendant l'import
+    ' =====================================================================
+
+    ' --------------------------------------------------------------------
+    ' IMPORT 1 : CA DANS REGION
+    ' --------------------------------------------------------------------
+    config(0).dossier = CHEMIN_BASE & "\CA\CA DANS REGION"     ' Dossier source
+    config(0).Plage = "A9:Z9"                                   ' Plage à copier (ligne 9, colonnes A à Z)
+    config(0).Feuille = "CA"                                    ' Feuille de destination
+    config(0).ModeAppend = True                                 ' Ajouter à la suite des données existantes
+    config(0).Message = "Import CA DANS REGION"                 ' Message de progression
+
+    ' --------------------------------------------------------------------
+    ' IMPORT 2 : CA HORS REGION
+    ' --------------------------------------------------------------------
+    config(1).dossier = CHEMIN_BASE & "\CA\CA HORS REGION"     ' Dossier source
+    config(1).Plage = "A9:Z9"                                   ' Plage à copier (ligne 9, colonnes A à Z)
+    config(1).Feuille = "CA"                                    ' Feuille de destination (même que Import 1)
+    config(1).ModeAppend = True                                 ' Ajouter à la suite (après Import 1)
+    config(1).Message = "Import CA HORS REGION"                 ' Message de progression
+
+    ' --------------------------------------------------------------------
+    ' IMPORT 3 : AR09
+    ' --------------------------------------------------------------------
+    config(2).dossier = CHEMIN_BASE & "\AR09"                   ' Dossier source
+    config(2).Plage = "A3:X3"                                   ' Plage à copier (ligne 3, colonnes A à X)
+    config(2).Feuille = "AR09"                                  ' Feuille de destination
+    config(2).ModeAppend = False                                ' Écraser les données (début ligne 2)
+    config(2).Message = "Import AR09"                           ' Message de progression
+
+    ' --------------------------------------------------------------------
+    ' IMPORT 4 : VISIO
+    ' --------------------------------------------------------------------
+    config(3).dossier = CHEMIN_BASE & "\VISIO"                  ' Dossier source
+    config(3).Plage = "A5:BK5"                                  ' Plage à copier (ligne 5, colonnes A à BK)
+    config(3).Feuille = "VISIO"                                 ' Feuille de destination
+    config(3).ModeAppend = False                                ' Écraser les données (début ligne 2)
+    config(3).Message = "Import VISIO"                          ' Message de progression
+
+    ' --------------------------------------------------------------------
+    ' IMPORT 5 : CORRESPONDANCE
+    ' --------------------------------------------------------------------
+    config(4).dossier = CHEMIN_BASE & "\CORRESPONDANCE"         ' Dossier source
+    config(4).Plage = "A3:D3"                                   ' Plage à copier (ligne 3, colonnes A à D)
+    config(4).Feuille = "Corresp bureau de l'expert"            ' Feuille de destination
+    config(4).ModeAppend = False                                ' Écraser les données (début ligne 2)
+    config(4).Message = "Import Correspondance"                 ' Message de progression
+
+    ' --------------------------------------------------------------------
+    ' FIN DE LA CONFIGURATION
+    ' --------------------------------------------------------------------
+
+    ObtenirConfiguration = config
+
+End Function
+
+
+' =====================================================================
+' ==================  PROCÉDURE PRINCIPALE  ===========================
+' =====================================================================
+
+Sub ImporterBasesReseau_FactoriséFullOpti()
+
+    Dim config() As ConfigImport
     Dim i As Long
+    Dim nbImportsReussis As Long
+    Dim nbImportsEchoues As Long
+    Dim listeErreurs As String
 
-    ' ================= OPTIMISATION DES PERFORMANCES =================
+    ' =============== OPTIMISATION ===============
     Application.ScreenUpdating = False
     Application.EnableEvents = False
     Application.Calculation = xlCalculationManual
     Application.DisplayAlerts = False
-    Application.StatusBar = "Démarrage de l'importation des données..."
-    ' ================================================================
+    Application.StatusBar = MSG_DEBUT
+    ' ===========================================
 
-    ' ===================== DOSSIERS SOURCES =========================
-    ReDim sourceFoldersCA(1)
-    sourceFoldersCA(0) = "\\CHEMIN_SOURCE_ANONYME1"
-    sourceFoldersCA(1) = "\\CHEMIN_SOURCE_ANONYME2"
+    ' Initialisation des compteurs
+    nbImportsReussis = 0
+    nbImportsEchoues = 0
+    listeErreurs = ""
 
-    folderAR09 = "\\CHEMIN_SOURCE_ANONYME3"
-    folderVISIO = "\\CHEMIN_SOURCE_ANONYME4"
-    folderCORRESP = "\\CHEMIN_SOURCE_ANONYME5"
+    ' Chargement de la configuration
+    config = ObtenirConfiguration()
 
-    ' ===================== PLAGES MODÈLES ===========================
-    ' Ces plages servent de référence pour détecter :
-    ' - la ligne de départ
-    ' - les colonnes à importer
-    ReDim templateRangesCA(1)
-    templateRangesCA(0) = "A9:Z9"
-    templateRangesCA(1) = "A9:Z9"
+    ' Exécution de tous les imports
+    For i = LBound(config) To UBound(config)
+        Application.StatusBar = config(i).Message & " (" & i + 1 & "/" & UBound(config) + 1 & ")..."
 
-    rangeAR09 = "A3:X3"
-    rangeVISIO = "A5:BK5"
-    rangeCORRESP = "A3:D3"
-
-    ' ================================================================
-    ' ===================== IMPORT DES DONNÉES =======================
-    ' ================================================================
-
-    ' --- CA : deux dossiers, même feuille cible ---
-    For i = LBound(sourceFoldersCA) To UBound(sourceFoldersCA)
-        Application.StatusBar = "Import CA (" & i + 1 & "/" & UBound(sourceFoldersCA) + 1 & ")..."
-        ImportLatestFileIntoSheet sourceFoldersCA(i), templateRangesCA(i), "CA", True
+        ' Appel du moteur avec gestion d'erreur
+        If ImporterBase(config(i).dossier, config(i).Plage, config(i).Feuille, config(i).ModeAppend) Then
+            nbImportsReussis = nbImportsReussis + 1
+            Debug.Print "✓ " & config(i).Message & " : OK"
+        Else
+            nbImportsEchoues = nbImportsEchoues + 1
+            listeErreurs = listeErreurs & "- " & config(i).Message & vbCrLf
+            Debug.Print "✗ " & config(i).Message & " : ERREUR"
+        End If
     Next i
 
-    ' --- AR09 ---
-    Application.StatusBar = "Import AR09..."
-    ImportLatestFileIntoSheet folderAR09, rangeAR09, "AR09", False
-
-    ' --- VISIO ---
-    Application.StatusBar = "Import VISIO..."
-    ImportLatestFileIntoSheet folderVISIO, rangeVISIO, "VISIO", False
-
-    ' --- CORRESPONDANCE ---
-    Application.StatusBar = "Import Correspondance..."
-    ImportLatestFileIntoSheet folderCORRESP, rangeCORRESP, "Corresp bureau de l'expert", False
-
-Cleanup:
-    ' ================= RESTAURATION DE L’ENVIRONNEMENT ===============
+Fin_Import:
+    ' Rétablissement des paramètres Excel
     Application.Calculation = xlCalculationAutomatic
     Application.ScreenUpdating = True
     Application.EnableEvents = True
     Application.DisplayAlerts = True
-    Application.StatusBar = "? Toutes les bases ont été importées avec succès."
+    Application.StatusBar = False
 
-End Sub
-
-
-' =============================================================================
-' FONCTION D’IMPORT
-' =============================================================================
-' Ouvre le fichier Excel le plus récent d’un dossier donné et copie les données vers la feuille cible.
-'
-' Paramètres :
-' - sourceFolder  : Dossier contenant les fichiers Excel
-' - templateRange : Plage modèle servant à identifier colonnes et ligne de départ
-' - targetSheet   : Nom de la feuille de destination
-' - appendData    : Si True, ajoute les données à la suite de l’existant
-' =============================================================================
-Public Sub ImportLatestFileIntoSheet( _
-    ByVal sourceFolder As String, _
-    ByVal templateRange As String, _
-    ByVal targetSheet As String, _
-    Optional ByVal appendData As Boolean = False)
-
-    Dim wbSource As Workbook
-    Dim wsSource As Worksheet
-    Dim wsTarget As Worksheet
-    Dim latestFile As String
-
-    Dim startCell As String, endCell As String
-    Dim startCol As String, endCol As String
-    Dim startRow As Long
-    Dim lastSourceRow As Long
-    Dim targetRow As Long
-
-    Set wsTarget = ThisWorkbook.Sheets(targetSheet)
-
-    ' Récupération du fichier le plus récent
-    latestFile = GetLatestExcelFile(sourceFolder)
-    If latestFile = "" Then Exit Sub
-
-    ' Ouverture du fichier source en lecture seule (performance)
-    Set wbSource = Workbooks.Open(latestFile, ReadOnly:=True)
-    Set wsSource = wbSource.Sheets(1)
-
-    ' Analyse de la plage modèle
-    startCell = Split(templateRange, ":")(0)
-    endCell = Split(templateRange, ":")(1)
-
-    startRow = wsSource.Range(startCell).Row
-    startCol = Replace(startCell, startRow, "")
-    endCol = Replace(endCell, startRow, "")
-
-    ' Détection de la dernière ligne source à partir de la première colonne
-    lastSourceRow = wsSource.Cells(wsSource.Rows.Count, startCol).End(xlUp).Row
-
-    ' Détermination de la ligne de collage dans la feuille cible
-    If appendData Then
-        targetRow = wsTarget.Cells(wsTarget.Rows.Count, "A").End(xlUp).Row + 1
+    ' Message récapitulatif
+    If nbImportsEchoues = 0 Then
+        MsgBox MSG_SUCCES & vbCrLf & vbCrLf & _
+               "Imports réussis : " & nbImportsReussis & "/" & (nbImportsReussis + nbImportsEchoues), _
+               vbInformation, "Import IDFC - Succès"
     Else
-        targetRow = 2
+        MsgBox MSG_ERREUR_PARTIEL & vbCrLf & vbCrLf & _
+               "Imports réussis : " & nbImportsReussis & vbCrLf & _
+               "Imports échoués : " & nbImportsEchoues & vbCrLf & vbCrLf & _
+               "Détails des erreurs :" & vbCrLf & listeErreurs, _
+               vbExclamation, "Import IDFC - Attention"
     End If
 
-    ' Collage rapide : valeurs + formats numériques (dates conservées)
-    wsSource.Range(startCol & startRow & ":" & endCol & lastSourceRow).Copy
-    wsTarget.Range("A" & targetRow).PasteSpecial xlPasteValuesAndNumberFormats
-    Application.CutCopyMode = False
-
-    wbSource.Close SaveChanges:=False
-
 End Sub
 
 
-' =============================================================================
-' FONCTION DE RECUPERATION DES FICHIERS SOURCE
-' =============================================================================
-Public Function GetLatestExcelFile(ByVal folderPath As String) As String
+' =====================================================================
+' ==============  MOTEUR DYNAMIQUE (NE PAS MODIFIER)  =================
+' =====================================================================
 
-    Dim fileName As String
-    Dim latestFile As String
-    Dim latestDate As Date
+Function ImporterBase(dossier As String, plageModèle As String, nomFeuille As String, Optional append As Boolean = False) As Boolean
 
-    fileName = Dir(folderPath & "\*.xlsx")
-    latestDate = 0
+    On Error GoTo Erreur_Import
 
-    Do While fileName <> ""
-        If FileDateTime(folderPath & "\" & fileName) > latestDate Then
-            latestDate = FileDateTime(folderPath & "\" & fileName)
-            latestFile = folderPath & "\" & fileName
+    Dim wsDest As Worksheet
+    Dim wb As Workbook, ws As Worksheet
+    Dim f As String
+    Dim colDeb As String, colFin As String
+    Dim colDebL As String, colFinL As String
+    Dim ligneDeb As Long, derLigSrc As Long, derLigDest As Long
+
+    ' Vérifier que la feuille de destination existe
+    On Error Resume Next
+    Set wsDest = ThisWorkbook.Sheets(nomFeuille)
+    On Error GoTo Erreur_Import
+
+    If wsDest Is Nothing Then
+        Debug.Print "Erreur : Feuille destination introuvable - " & nomFeuille
+        ImporterBase = False
+        Exit Function
+    End If
+
+    ' Trouver fichier le plus récent
+    f = FichierPlusRecent(dossier)
+    If f = "" Then
+        Debug.Print "Erreur : Aucun fichier trouvé dans - " & dossier
+        ImporterBase = False
+        Exit Function
+    End If
+
+    ' Ouverture rapide
+    Set wb = Workbooks.Open(f, ReadOnly:=True, UpdateLinks:=0)
+    Set ws = wb.Sheets(1)
+
+    ' Détection bornes
+    colDeb = Split(plageModèle, ":")(0)
+    colFin = Split(plageModèle, ":")(1)
+
+    ligneDeb = ws.Range(colDeb).Row
+    colDebL = Replace(colDeb, ligneDeb, "")
+    colFinL = Replace(colFin, ligneDeb, "")
+
+    ' Dernière ligne source dans la colonne de départ
+    derLigSrc = ws.Cells(ws.Rows.Count, colDebL).End(xlUp).Row
+
+    ' Détermination ligne destination
+    If append Then
+        derLigDest = wsDest.Cells(wsDest.Rows.Count, "A").End(xlUp).Row + 1
+    Else
+        derLigDest = 2
+    End If
+
+    ' Collage ultra rapide avec valeurs + formats (dates conservées)
+    ws.Range(colDebL & ligneDeb & ":" & colFinL & derLigSrc).Copy
+    wsDest.Range("A" & derLigDest).PasteSpecial xlPasteValuesAndNumberFormats
+    Application.CutCopyMode = False
+
+    wb.Close False
+
+    ImporterBase = True
+    Exit Function
+
+Erreur_Import:
+    On Error Resume Next
+    If Not wb Is Nothing Then wb.Close False
+    On Error GoTo 0
+
+    Debug.Print "Erreur lors de l'import : " & Err.Description
+    ImporterBase = False
+
+End Function
+
+Function FichierPlusRecent(dossier As String) As String
+
+    Dim f As String
+    Dim dernierFichier As String
+    Dim derniereDate As Date
+
+    On Error Resume Next
+    f = Dir(dossier & "\*.xlsx")
+    derniereDate = 0
+
+    Do While f <> ""
+        If FileDateTime(dossier & "\" & f) > derniereDate Then
+            derniereDate = FileDateTime(dossier & "\" & f)
+            dernierFichier = dossier & "\" & f
         End If
-        fileName = Dir
+        f = Dir
     Loop
 
-    GetLatestExcelFile = latestFile
+    FichierPlusRecent = dernierFichier
 
 End Function

@@ -1,72 +1,174 @@
-Option Explicit
+' =====================================================================
+' ==================  ZONE DE CONFIGURATION  ==========================
+' =====================================================================
+' Modifier UNIQUEMENT la fonction "ObtenirConfigNettoyage" pour adapter
+' le nettoyage à d'autres reportings + lire les annotations pour
+' naviguer aisément dans le code.
+' =====================================================================
 
-Sub Nettoyage_Région1()
+' ===== MESSAGES D'ÉTAT =====
+Const MSG_DEBUT_NETTOYAGE As String = "Début du nettoyage..."
+Const MSG_SUCCES_NETTOYAGE As String = "✅ Nettoyage terminé pour IDFC !"
+Const MSG_ERREUR_FEUILLE As String = "⚠️ Feuille introuvable : "
+
+
+Private Type ConfigNettoyage
+    nomFeuille As String
+    derniereColonne As String
+    Message As String
+End Type
+
+Function ObtenirConfigNettoyage() As ConfigNettoyage()
+
+    ' ===== NOMBRE DE FEUILLES À NETTOYER =====
+    ' Si vous avez 6 feuilles : écrire "ReDim config(0 To 5)"
+    ' Si vous avez 3 feuilles : écrire "ReDim config(0 To 2)"
+    Dim config() As ConfigNettoyage
+    ReDim config(0 To 3)  ' Ici nous avons 4 feuilles (de 0 à 3)
+
+    ' =====================================================================
+    ' ===== DÉFINITION DE CHAQUE FEUILLE À NETTOYER (1 BLOC = 1 FEUILLE) =====
+    ' =====================================================================
+    ' Pour chaque feuille, remplir les 3 lignes suivantes :
+    '   .nomFeuille       : Nom exact de la feuille dans le classeur
+    '   .derniereColonne  : Dernière colonne à nettoyer (ex: "Z" nettoie de A à Z)
+    '   .Message          : Texte affiché pendant le nettoyage de cette feuille
+    '
+    ' IMPORTANT : Le nettoyage commence toujours à la ligne 2 (ligne 1 = en-têtes)
+    '             et efface jusqu'à la dernière ligne contenant des données
+    ' =====================================================================
+
+    ' --------------------------------------------------------------------
+    ' FEUILLE 1 : AR09
+    ' --------------------------------------------------------------------
+    config(0).nomFeuille = "AR09"                               ' Nom de la feuille
+    config(0).derniereColonne = "X"                             ' Nettoie de A2 à X[dernière ligne]
+    config(0).Message = "Nettoyage AR09"                        ' Message de progression
+
+    ' --------------------------------------------------------------------
+    ' FEUILLE 2 : VISIO
+    ' --------------------------------------------------------------------
+    config(1).nomFeuille = "VISIO"                              ' Nom de la feuille
+    config(1).derniereColonne = "BK"                            ' Nettoie de A2 à BK[dernière ligne]
+    config(1).Message = "Nettoyage VISIO"                       ' Message de progression
+
+    ' --------------------------------------------------------------------
+    ' FEUILLE 3 : CORRESPONDANCE
+    ' --------------------------------------------------------------------
+    config(2).nomFeuille = "Corresp bureau de l'expert"         ' Nom de la feuille
+    config(2).derniereColonne = "D"                             ' Nettoie de A2 à D[dernière ligne]
+    config(2).Message = "Nettoyage Correspondance"              ' Message de progression
+
+    ' --------------------------------------------------------------------
+    ' FEUILLE 4 : CA
+    ' --------------------------------------------------------------------
+    config(3).nomFeuille = "CA"                                 ' Nom de la feuille
+    config(3).derniereColonne = "Z"                             ' Nettoie de A2 à Z[dernière ligne]
+    config(3).Message = "Nettoyage CA"                          ' Message de progression
+
+    ' --------------------------------------------------------------------
+    ' FIN DE LA CONFIGURATION
+    ' --------------------------------------------------------------------
+
+    ObtenirConfigNettoyage = config
+
+End Function
+
+
+' =====================================================================
+' ==================  PROCÉDURE PRINCIPALE  ===========================
+' =====================================================================
+
+Sub IDFC_Nettoyage_Bases_FullSpeed()
+
+    Dim config() As ConfigNettoyage
+    Dim i As Long
+    Dim nbFeuillesNettoyees As Long
+    Dim nbFeuillesIgnorees As Long
+
+    ' =============== OPTIMISATION ===============
+    Application.ScreenUpdating = False
+    Application.EnableEvents = False
+    Application.Calculation = xlCalculationManual
+    Application.DisplayAlerts = False
+    Application.StatusBar = MSG_DEBUT_NETTOYAGE
+    ' =====================================================
+
+    ' Initialisation des compteurs
+    nbFeuillesNettoyees = 0
+    nbFeuillesIgnorees = 0
+
+    ' Chargement de la configuration
+    config = ObtenirConfigNettoyage()
+
+    ' Nettoyage de toutes les feuilles configurées
+    For i = LBound(config) To UBound(config)
+
+        Application.StatusBar = config(i).Message & " (" & i + 1 & "/" & UBound(config) + 1 & ")..."
+
+        ' Appel du moteur de nettoyage avec gestion d'erreur
+        If NettoyerFeuille(config(i).nomFeuille, config(i).derniereColonne) Then
+            nbFeuillesNettoyees = nbFeuillesNettoyees + 1
+        Else
+            nbFeuillesIgnorees = nbFeuillesIgnorees + 1
+        End If
+
+    Next i
+
+Fin_Nettoyage:
+    ' Rétablissement des paramètres Excel
+    Application.Calculation = xlCalculationAutomatic
+    Application.ScreenUpdating = True
+    Application.EnableEvents = True
+    Application.DisplayAlerts = True
+    Application.StatusBar = False
+
+    ' Message récapitulatif
+    MsgBox MSG_SUCCES_NETTOYAGE & vbCrLf & vbCrLf & _
+           "Feuilles nettoyées : " & nbFeuillesNettoyees & vbCrLf & _
+           "Feuilles ignorées : " & nbFeuillesIgnorees, _
+           vbInformation, "Nettoyage IDFC"
+
+End Sub
+
+
+' =====================================================================
+' ==============  MOTEUR DYNAMIQUE (NE PAS MODIFIER)  =================
+' =====================================================================
+
+Function NettoyerFeuille(nomFeuille As String, derniereColonne As String) As Boolean
 
     Dim ws As Worksheet
     Dim lastRow As Long
-    Dim sheetsInfo As Variant
-    Dim i As Long
 
-    ' =====================================================================
-    ' OPTIMISATION DES PERFORMANCES
-    ' =====================================================================
-    Application.ScreenUpdating = False
-    Application.Calculation = xlCalculationManual
-    Application.EnableEvents = False
+    ' Gestion d'erreur : vérifier si la feuille existe
+    On Error Resume Next
+    Set ws = ThisWorkbook.Sheets(nomFeuille)
+    On Error GoTo 0
 
-    ' =====================================================================
-    ' PARAMÉTRAGE DES FEUILLES À NETTOYER
-    ' =====================================================================
-    ' Structure du tableau :
-    '   - Nom de la feuille
-    '   - Dernière colonne à vider
-    '
-    ' Le nettoyage s’effectue systématiquement à partir de la ligne 2
-    ' afin de préserver les en-têtes.
-    sheetsInfo = Array( _
-        Array("AR09", "X"), _
-        Array("VISIO", "BK"), _
-        Array("Corresp bureau de l'expert", "D"), _
-        Array("CA", "Z") _
-    )
+    ' Si la feuille n'existe pas, on quitte sans erreur
+    If ws Is Nothing Then
+        Debug.Print MSG_ERREUR_FEUILLE & nomFeuille
+        NettoyerFeuille = False
+        Exit Function
+    End If
 
-    ' =====================================================================
-    ' BOUCLE DE NETTOYAGE DES FEUILLES
-    ' =====================================================================
-    For i = LBound(sheetsInfo) To UBound(sheetsInfo)
+    ' Trouver la dernière ligne utilisée dans la colonne A
+    lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
 
-        ' Tentative de récupération de la feuille
-        On Error Resume Next
-        Set ws = ThisWorkbook.Sheets(sheetsInfo(i)(0))
-        On Error GoTo 0
+    ' Si des données existent au-delà de la ligne 1 (en-têtes)
+    If lastRow >= 2 Then
+        ' Effacement ultra-rapide des valeurs uniquement (conserve les formules)
+        ws.Range("A2:" & derniereColonne & lastRow).ClearContents
+        Debug.Print "✓ " & nomFeuille & " : " & lastRow - 1 & " lignes nettoyées"
+    Else
+        Debug.Print "○ " & nomFeuille & " : aucune donnée à nettoyer"
+    End If
 
-        ' Si la feuille n’existe pas, on passe à la suivante
-        If ws Is Nothing Then GoTo NextSheet
+    ' Libération de la mémoire
+    Set ws = Nothing
 
-        ' Détection de la dernière ligne utilisée sur la colonne A
-        lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+    ' Succès
+    NettoyerFeuille = True
 
-        ' Nettoyage uniquement si des données existent sous l’en-tête
-        If lastRow >= 2 Then
-            ' Nettoyage rapide :
-            ' - suppression des valeurs uniquement
-            ' - formats, largeurs et structures conservés
-            ws.Range("A2:" & sheetsInfo(i)(1) & lastRow).Value = ""
-        End If
-
-NextSheet:
-        ' Libération explicite de l’objet feuille avant itération suivante
-        Set ws = Nothing
-    Next i
-
-    ' =====================================================================
-    ' RESTAURATION DES PARAMÈTRES EXCEL
-    ' =====================================================================
-    Application.EnableEvents = True
-    Application.Calculation = xlCalculationAutomatic
-    Application.ScreenUpdating = True
-
-    ' Message de confirmation utilisateur
-    MsgBox "Nettoyage terminé pour IDFC !", vbInformation
-
-End Sub
+End Function

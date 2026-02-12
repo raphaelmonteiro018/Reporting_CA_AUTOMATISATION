@@ -24,7 +24,7 @@ Function ObtenirConfiguration() As ConfigImport()
 
     ' ===== CHEMIN DE BASE COMMUN À TOUS LES IMPORTS =====
     ' Ce chemin sera automatiquement ajouté devant chaque sous-dossier
-    Const CHEMIN_BASE As String = "\\idfpls03\Assistant\REPORTING POLE\Actualisation des rapports\CA IDFC"
+    Const CHEMIN_BASE As String = "\\cheminSource"
 
     ' ===== NOMBRE D'IMPORTS À EFFECTUER =====
     ' Si vous avez 6 imports : écrire "ReDim config(0 To 5)"

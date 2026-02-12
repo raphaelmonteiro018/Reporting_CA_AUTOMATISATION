@@ -79,7 +79,7 @@ End Function
 ' ==================  PROCÉDURE PRINCIPALE  ===========================
 ' =====================================================================
 
-Sub IDFC_Nettoyage_Bases_FullSpeed()
+Sub Nettoyage_Bases()
 
     Dim config() As ConfigNettoyage
     Dim i As Long

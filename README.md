@@ -15,4 +15,4 @@
 
 ## Power Automate Desktop : Résultat final
 - Le workflow s'exécute en arrière-plan, en 1 minute les extractions des deux régions sont actualisées, rangées dans des dossiers spécifiques et prêtes pour l'import.
-- Le code VBA va ensuite piocher les plages désirées dans chaque fichier exporté pour les coller dans les plages spécifiées du reporting.
+- Le code VBA va ensuite piocher les plages désirées dans chaque fichier exporté pour les coller dans les onglets du reporting.

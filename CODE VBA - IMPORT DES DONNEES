@@ -46,7 +46,7 @@ Function ObtenirConfiguration() As ConfigImport()
     ' --------------------------------------------------------------------
     ' IMPORT 1 : CA DANS REGION
     ' --------------------------------------------------------------------
-    config(0).dossier = CHEMIN_BASE & "\CA\CA DANS REGION"     ' Dossier source
+    config(0).dossier = CHEMIN_BASE & "\CA\CA DANS REGION"      ' Dossier source
     config(0).Plage = "A9:Z9"                                   ' Plage à copier (ligne 9, colonnes A à Z)
     config(0).Feuille = "CA"                                    ' Feuille de destination
     config(0).ModeAppend = True                                 ' Ajouter à la suite des données existantes
@@ -55,7 +55,7 @@ Function ObtenirConfiguration() As ConfigImport()
     ' --------------------------------------------------------------------
     ' IMPORT 2 : CA HORS REGION
     ' --------------------------------------------------------------------
-    config(1).dossier = CHEMIN_BASE & "\CA\CA HORS REGION"     ' Dossier source
+    config(1).dossier = CHEMIN_BASE & "\CA\CA HORS REGION"      ' Dossier source
     config(1).Plage = "A9:Z9"                                   ' Plage à copier (ligne 9, colonnes A à Z)
     config(1).Feuille = "CA"                                    ' Feuille de destination (même que Import 1)
     config(1).ModeAppend = True                                 ' Ajouter à la suite (après Import 1)
